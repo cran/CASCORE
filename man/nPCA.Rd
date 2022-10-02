@@ -22,7 +22,7 @@ iterations allowed. The default value is 100.}
 random sets should be chosen? The default value is 10.}
 }
 \value{
-A label vector.
+\item{estall}{A lavel vector.}
 }
 \description{
 \emph{Normalized Principle Component Analysis (nPCA)}, also known as spectral clustering on the

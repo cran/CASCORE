@@ -9,10 +9,10 @@
 #'   iterations allowed. The default value is 100.
 #' @param startn \code{k-means} parameter. If centers is a number, how many
 #'   random sets should be chosen? The default value is 10.
-#' @return A label vector.
+#' @return \item{estall}{A lavel vector.}
 #'
 #' @importFrom stats kmeans runif
-#' @references Chung, F. R., & Graham, F. C. (1997). \emph{Spectral graph theory (Vol. 92)}
+#' @references Chung, F. R., & Graham, F. C. (1997). \emph{Spectral graph theory (Vol. 92)}.
 #'   \emph{American Mathematical Soc..}
 #' @examples
 #'
@@ -55,8 +55,10 @@ oPCA = function(Adj, K, itermax = 100, startn = 10){
   o.eigen = eigen(Adj)
   O = o.eigen$vectors
   O = O[, 1:K]
-  result = tryCatch({kmeans(O, K, iter.max = 100, nstart = 10)}, error = function(x)
-  {kmeans(O, K, iter.max = 1000, nstart = 10, algorithm = "Lloyd")})
+
+  result = tryCatch({kmeans(O, K, iter.max = itermax, nstart = startn)}, error = function(x)
+  {kmeans(O, K, iter.max = itermax, nstart = startn, algorithm="Lloyd")})
+
   est = as.factor(result$cluster)
   return(est)
 }

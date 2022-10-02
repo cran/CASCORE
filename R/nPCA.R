@@ -11,7 +11,7 @@
 #'   iterations allowed. The default value is 100.
 #' @param startn \code{k-means} parameter. If centers is a number, how many
 #'   random sets should be chosen? The default value is 10.
-#' @return A label vector.
+#' @return \item{estall}{A lavel vector.}
 #'
 #' @importFrom stats kmeans runif
 #' @references Chung, F. R., & Graham, F. C. (1997). \emph{Spectral graph theory (Vol. 92)}.
@@ -63,9 +63,9 @@ nPCA = function(Adj, K, tau = NULL, itermax = 100, startn = 10){
   s.eigen = eigen(Z)
   H = s.eigen$vectors
   H = H[, 1:K]
-  #apply k-means on ratio matrix
-  result = tryCatch({kmeans(H, K, iter.max = 100, nstart = 10)}, error = function(x)
-  {kmeans(H, K, iter.max = 100, nstart = 10, algorithm = "Lloyd")})
+  #apply kmeans on ratio matrix
+  result = tryCatch({kmeans(H, K, iter.max = itermax, nstart = startn)}, error = function(x)
+  {kmeans(H, K, iter.max = 100, nstart = 99)})
 
   est = as.factor(result$cluster)
   return(est)

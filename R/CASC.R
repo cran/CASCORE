@@ -14,10 +14,13 @@
 #' @param startn \code{k-means} parameter. If centers is a number, how many random sets should
 #'   be chosen? The default value is 10.
 #'
-#' @return A label vector.
+#' @return  \item{estall}{A lavel vector.}
 #'
 #' @importFrom pracma eig Norm
 #' @importFrom stats kmeans runif
+#'
+#' @references Binkiewicz, N., Vogelstein, J. T., & Rohe, K. (2017). \emph{Covariate-assisted spectral clustering}.
+#'   \emph{Biometrika, 104(2), 361-377.}\cr\doi{10.1093/biomet/asx008}\cr
 #' @examples
 #'
 #' # Simulate the Network
@@ -73,10 +76,12 @@ CASC = function(Adj, Covariate, K, alphan = 5, itermax = 100, startn = 10){
   for(ii in 1:alphan){
     casc.eigen = eigen(Z%*%Z + alpha[ii]*ca);
     U = casc.eigen$vectors[,1:K];
-    U = U/apply(U, 1, Norm);
+    Unorm = apply(U, 1, Norm);
+    indu = which(Unorm > 0);
+    U = U[indu, ]/Unorm[indu]
     result = kmeans(U, K, iter.max = itermax, nstart = startn);
     d[ii] = result$tot.withinss;
-    est[ii, ] = as.factor(result$cluster)
+    est[ii, indu] = as.factor(result$cluster)
   }
   result = est[which.min(d), ]
   return(result)

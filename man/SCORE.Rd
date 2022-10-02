@@ -18,7 +18,7 @@ iterations allowed. The default value is 100.}
 random sets should be chosen? The default value is 10.}
 }
 \value{
-A label vector.
+\item{estall}{A lavel vector.}
 }
 \description{
 Using ratios-of-eigenvectors to detect underlying communities.
@@ -58,7 +58,6 @@ SCORE(Giant, 2)
 
 }
 \references{
-Jin, J. (2015) \emph{Fast community detection by score}.
-  \emph{The Annals of Statistics 43 (1),
-  57–89}\cr\url{https://projecteuclid.org/euclid.aos/1416322036}\cr
+Jin, J. (2015). \emph{Fast community detection by score}.
+  \emph{The Annals of Statistics 43 (1), 57–89.}\cr\doi{10.1214/14-AOS1265}\cr
 }

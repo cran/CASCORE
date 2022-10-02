@@ -1,6 +1,6 @@
-context("CASCORE")
+context("ADMM")
 
-test_that("CASCORE stops when it should", {
+test_that("ADMM stops when it should", {
   expect_error( runningmean(0, c(0,0)) )
 })
 
@@ -34,13 +34,13 @@ W = t(W)
 D0 = Q %*% W
 X = matrix(0, n, p)
 N = switch(caseno, rep(100, n), rep(100, n), round(runif(n)*Nrange+ Nmin),
-  round(runif(n)* Nrange+Nmin))
+           round(runif(n)* Nrange+Nmin))
 for (i in 1: ncol(D0)){
   X[i, ] = rmultinom(1, N[i], D0[, i])
 }
 
 test_that("This function returns a list of predicted membership of all nodes, the optimal weight between the graph
           and the covariates, as well as within-group variances for each value of alpha", {
-  expect_length(CASCORE(Adj, X, K), n)
-  expect_length(unique(CASCORE(Adj, X, K)), K)
-})
+            expect_length(ADMM(Adj, X, lambda = 0.2, K = K, alpha = 0.5, rho = 2, TT = 100, tol = 5), n)
+            expect_length(unique(ADMM(Adj, X, lambda = 0.2, K = K, alpha = 0.5, rho = 2, TT = 100, tol = 5)), K)
+          })

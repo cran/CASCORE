@@ -11,20 +11,18 @@
 #' @param Covariate A covariate matrix. The rows correspond to nodes and the columns correspond to covariates.
 #' @param K A positive integer, indicating the number of underlying communities in graph \code{Adj}.
 #' @param alpha A numeric vector, each element of which is a tuning parameter to weigh the covariate matrix.
+#' @param alphan The number of candidates \eqn{\alpha}. The default number is 5.
 #' @param itermax \code{k-means} parameter, indicating the maximum number of
 #'   iterations allowed. The default value is 100.
 #' @param startn \code{k-means} parameter. If centers is a number, how many
 #'   random sets should be chosen? The default value is 10.
-#' @param L Either 1 or 2. 1 indicates \eqn{L_1} norm and 2 indicates \eqn{L_2} norm. The default values is 2.
-#'
-#' @return \item{estall}{A lavel vector} \item{optimal_alpha}{The optimal \eqn{\alpha} that gives the smallest
-#'  within-group variances.} \item{within_var}{The values of within-group variances for each value of \eqn{\alpha}.}
+#' @return \item{estall}{A lavel vector.}
 #'
 #' @importFrom pracma eig Norm
-#' @importFrom stats kmeans runif
+#' @importFrom stats kmeans runif median
 #'
-#' @references Hu, Y., & Wang, W. (2022) \emph{Covariate-Assisted Community Detection on Sparse Networks},
-#'   \cr\url{https://arxiv.org/abs/2208.00257}\cr
+#' @references Hu, Y., & Wang, W. (2022). \emph{Covariate-Assisted Community Detection on Sparse Networks}.
+#'   \cr\doi{10.48550/arXiv.2208.00257}\cr
 #'
 #' @examples
 #'
@@ -64,13 +62,12 @@
 
 #' @export
 
-CASCORE = function(Adj, Covariate, K, alpha = NULL, itermax = 100, startn = 10, L = NULL){
+CASCORE = function(Adj, Covariate, K, alpha = NULL, alphan = 5, itermax = 100, startn = 10){
   # Inputs:
   # 1) Adj: an n by n symmetric adjacency matrix whose diagonals = 0 and positive entries = 1.
   # 2) Covariate: an n by p covariate matrix
   # 3) K: a positive integer which is no larger than n. This is the predefined number of communities.
-  # 4) alpha: a vector of positive numbers to tune the weight of covariate matrix
-  # 5) L: 1 indicates L1 norm; 2 indicates L2 norm; the defalt value if 2
+  # 3) alpha: a positive number to tune the weight of covariate matrix
 
   # Optional Arguments for Kmeans:
   # 1) itermax: the maximum number of iterations allowed.
@@ -99,54 +96,41 @@ CASCORE = function(Adj, Covariate, K, alpha = NULL, itermax = 100, startn = 10, 
   d = rowSums(Adj);
   X = Adj %*% Covariate
 
-  if (is.null(L)) {L = 2}
+  diagcomp = cbind(1, median(d)/(d+0.5));
+  lambda = apply(diagcomp, 1, min)
 
   if(is.null(alpha)){
-    #    alphaupper = norm(Adj, "2");
-    d.net = eig(Adj);
-    alphaupper = d.net[1]
-    alphalower = max(0.05, alphaupper/10);
+    d.net = sort(abs(eig(Adj)), decreasing = TRUE);
+    alphaupper = d.net[1]*log(n)/mean(d);
+    alphalower = max(0.05, d.net[K]/4);
 
-    alpha = seq(alphalower, alphaupper, length.out = 5);
-    est1 = matrix(0, 5, n); est2 = est1;
-    prop1 = rep(0, 5); prop2 = rep(0, 5)
+    alpha = seq(alphalower, alphaupper, length.out = alphan);
+    #    print(alpha)
+    est1 = matrix(0, alphan, n); est2 = est1;
+    prop1 = rep(0, alphan); prop2 = rep(0, alphan)
 
-    for(i in 1:5){
-      Newmat = X + alpha[i]*Covariate;
+    for(i in 1:alphan){
+      Newmat = X + alpha[i]*diag(lambda)%*%Covariate;
       zz = Newmat%*%t(Newmat)
       c = eigen(zz)
       vec = c$vectors
-      vecn = vec[,1:K]/apply(vec[,1:K], 1, Norm, p = L);
+      vecn = vec[,1:K]/apply(vec[,1:K], 1, Norm);
       result = kmeans(vecn, K, iter.max = itermax, nstart = startn);
       if (result$ifault==4) { result = kmeans(X, K,  iter.max = itermax, nstart = startn, algorithm="Lloyd"); }
       prop2[i] = result$tot.withinss;
       est2[i,] = as.factor(result$cluster);
     }
     est = est2[which.min(prop2), ];
-    #print(alpha[which.min(prop2)]);
-    optimalalpha = alpha[which.min(prop2)];
+    #    print(prop2)
   }
-
   else{
-    a = length(alpha)
-    est1 = matrix(0, a, n); est2 = est1;
-    prop1 = rep(0, a); prop2 = rep(0, a)
-    for (i in 1: a){
-      Newmat = X + alpha[i]*Covariate;
-      zz = Newmat%*%t(Newmat)
-      c = eigen(zz)
-      vec = c$vectors
-      vecn = vec[,1:K]/apply(vec[,1:K], 1, Norm, p = L);
-      result = kmeans(vecn, K, iter.max = itermax, nstart = startn);
-      if (result$ifault==4) { result = kmeans(X, K,  iter.max = itermax, nstart = startn, algorithm="Lloyd"); }
-      prop2[i] = result$tot.withinss;
-      est2[i,] = as.factor(result$cluster);
-    }
-    est = est2[which.min(prop2), ];
-    #print(alpha[which.min(prop2)]);
-    optimalalpha = alpha[which.min(prop2)];
+    Newmat = X + alpha*diag(lambda)%*%Covariate;
+    c.svd = svd(Newmat, nu = K, nv = K)
+    vec = c.svd$u
+    vecn = vec/apply(vec, 1, Norm);
+    result = kmeans(vecn, K, iter.max = itermax, nstart = startn);
+    est = as.factor(result$cluster);
   }
-
   estall[ind_reg] = est;
-  return(list(estall = estall, optimal_alpha = optimalalpha, within_var = prop2))
+  return(estall)
 }

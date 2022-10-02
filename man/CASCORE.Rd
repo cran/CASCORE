@@ -4,7 +4,15 @@
 \alias{CASCORE}
 \title{Covariate Assisted Spectral Clustering on Ratios of Eigenvectors.}
 \usage{
-CASCORE(Adj, Covariate, K, alpha = NULL, itermax = 100, startn = 10, L = NULL)
+CASCORE(
+  Adj,
+  Covariate,
+  K,
+  alpha = NULL,
+  alphan = 5,
+  itermax = 100,
+  startn = 10
+)
 }
 \arguments{
 \item{Adj}{A 0/1 adjacency matrix.}
@@ -15,17 +23,16 @@ CASCORE(Adj, Covariate, K, alpha = NULL, itermax = 100, startn = 10, L = NULL)
 
 \item{alpha}{A numeric vector, each element of which is a tuning parameter to weigh the covariate matrix.}
 
+\item{alphan}{The number of candidates \eqn{\alpha}. The default number is 5.}
+
 \item{itermax}{\code{k-means} parameter, indicating the maximum number of
 iterations allowed. The default value is 100.}
 
 \item{startn}{\code{k-means} parameter. If centers is a number, how many
 random sets should be chosen? The default value is 10.}
-
-\item{L}{Either 1 or 2. 1 indicates \eqn{L_1} norm and 2 indicates \eqn{L_2} norm. The default values is 2.}
 }
 \value{
-\item{estall}{A lavel vector} \item{optimal_alpha}{The optimal \eqn{\alpha} that gives the smallest
- within-group variances.} \item{within_var}{The values of within-group variances for each value of \eqn{\alpha}.}
+\item{estall}{A lavel vector.}
 }
 \description{
 Using ratios-of-eigenvectors to detect underlying communities in networks with node covariates.
@@ -76,6 +83,6 @@ for (i in 1: ncol(D0)){
 CASCORE(Adj, X, 2)
 }
 \references{
-Hu, Y., & Wang, W. (2022) \emph{Covariate-Assisted Community Detection on Sparse Networks},
-  \cr\url{https://arxiv.org/abs/2208.00257}\cr
+Hu, Y., & Wang, W. (2022). \emph{Covariate-Assisted Community Detection on Sparse Networks}.
+  \cr\doi{10.48550/arXiv.2208.00257}\cr
 }

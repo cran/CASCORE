@@ -19,7 +19,7 @@ iterations allowed. The default value is 100.}
 random sets should be chosen? The default value is 10.}
 }
 \value{
-A label vector.
+\item{estall}{A lavel vector.}
 }
 \description{
 \emph{Ordinary Principle Component Analysis (oPCA)}, also known as spectral clustering
@@ -47,6 +47,6 @@ Adj[lower.tri(Adj)] = t(Adj)[lower.tri(Adj)]
 oPCA(Adj, 2)
 }
 \references{
-Chung, F. R., & Graham, F. C. (1997). \emph{Spectral graph theory (Vol. 92)}
+Chung, F. R., & Graham, F. C. (1997). \emph{Spectral graph theory (Vol. 92)}.
   \emph{American Mathematical Soc..}
 }

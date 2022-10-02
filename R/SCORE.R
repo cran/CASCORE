@@ -11,13 +11,13 @@
 #'   iterations allowed. The default value is 100.
 #' @param startn \code{k-means} parameter. If centers is a number, how many
 #'   random sets should be chosen? The default value is 10.
-#' @return A label vector.
+#' @return \item{estall}{A lavel vector.}
 #'
 #' @importFrom stats kmeans runif
 #'
-#' @references Jin, J. (2015) \emph{Fast community detection by score}.
-#'   \emph{The Annals of Statistics 43 (1),
-#'   57–89}\cr\url{https://projecteuclid.org/euclid.aos/1416322036}\cr
+#' @references Jin, J. (2015). \emph{Fast community detection by score}.
+#'   \emph{The Annals of Statistics 43 (1), 57–89.}\cr\doi{10.1214/14-AOS1265}\cr
+#'
 #' @examples
 #'
 #' # Simulate the Network

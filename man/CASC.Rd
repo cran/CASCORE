@@ -22,7 +22,7 @@ The default value is 100.}
 be chosen? The default value is 10.}
 }
 \value{
-A label vector.
+\item{estall}{A lavel vector.}
 }
 \description{
 \emph{CASC} clusters graph nodes by applying spectral clustering with the assistance from
@@ -69,4 +69,8 @@ for (i in 1: ncol(D0)){
   X[i, ] = rmultinom(1, N[i], D0[, i])
 }
 CASC(Adj, X, 2)
+}
+\references{
+Binkiewicz, N., Vogelstein, J. T., & Rohe, K. (2017). \emph{Covariate-assisted spectral clustering}.
+  \emph{Biometrika, 104(2), 361-377.}\cr\doi{10.1093/biomet/asx008}\cr
 }
