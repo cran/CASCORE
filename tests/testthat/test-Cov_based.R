@@ -1,10 +1,10 @@
-context("SCORE")
+context("Cov_based")
 
-test_that("SCORE stops when it should", {
+test_that("Cov_based stops when it should", {
   expect_error( runningmean(0, c(0,0)) )
 })
 
-library(igraph)
+library(pracma)
 # Simulate the Network
 n = 10; K = 2;
 theta = 0.4 + (0.45-0.05)*(seq(1:n)/n)^2; Theta = diag(theta);
@@ -22,12 +22,7 @@ Adj = 1*(Adj >= 0)
 diag(Adj) = 0
 Adj[lower.tri(Adj)] = t(Adj)[lower.tri(Adj)]
 
-is.igraph(Adj) # [1] FALSE
-ix = components(graph.adjacency(Adj))
-componentLabel = ix$membership
-giantLabel = which(componentLabel == which.max(ix$csize))
-Giant = Adj[giantLabel, giantLabel]
-
-test_that("This function returns a list of predicted membership of all nodes in the giant component", {
-  expect_length(SCORE(Giant, K), length(giantLabel))
+test_that("This function returns a list of predicted membership of all nodes", {
+  expect_length(Cov_based(Adj, K), n)
+  expect_length(unique(Cov_based(Adj, K)), K)
 })

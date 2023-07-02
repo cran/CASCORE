@@ -32,19 +32,19 @@ iterations allowed. The default value is 100.}
 random sets should be chosen? The default value is 10.}
 }
 \value{
-\item{estall}{A lavel vector.}
+\item{estall}{A lavel vector}.
 }
 \description{
 Using ratios-of-eigenvectors to detect underlying communities in networks with node covariates.
 }
 \details{
-\emph{CASCORE} is fully established in \emph{Covariate-Assisted Community Detection
-  on Sparse Networks} of Hu & Wang (2022). \emph{CASCORE} detects the latent community structure
-  under the covariate assisted degree corrected stochastic block model (CADCSBM), and it allows
-  the disagreement between the community structures indicated in the graph and the covariates,
-  respectively. \code{K-means} is applied on the entry-wise ratios between first leading eigenvector
-  and each of the other \eqn{K} leading eigenvectors of the combined matrix of the adjacency matrix and the
-  covariate matrix, to reveal the underlying memberships.
+\emph{CASCORE} is fully established in \emph{Network-Adjusted Covariates for Community Detection}
+  of Hu & Wang (2023). \emph{CASCORE} detects the latent community structure under the covariate
+  assisted degree corrected stochastic block model (CADCSBM), and it allows the disagreement
+  between the community structures indicated in the graph and the covariates, respectively.
+  \code{K-means} is applied on the entry-wise ratios between first leading eigenvector and
+  each of the other \eqn{K} leading eigenvectors of the combined matrix of the adjacency matrix
+  and the covariate matrix, to reveal the underlying memberships.
 }
 \examples{
 
@@ -83,6 +83,6 @@ for (i in 1: ncol(D0)){
 CASCORE(Adj, X, 2)
 }
 \references{
-Hu, Y., & Wang, W. (2022). \emph{Covariate-Assisted Community Detection on Sparse Networks}.
-  \cr\doi{10.48550/arXiv.2208.00257}\cr
+Hu, Y., & Wang, W. (2023) \emph{Network-AdjustedCovariatesforCommunity Detection},
+  \cr\url{https://arxiv.org/abs/2306.15616}\cr
 }

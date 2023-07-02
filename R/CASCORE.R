@@ -1,12 +1,12 @@
 #' @title Covariate Assisted Spectral Clustering on Ratios of Eigenvectors.
 #' @description Using ratios-of-eigenvectors to detect underlying communities in networks with node covariates.
-#' @details \emph{CASCORE} is fully established in \emph{Covariate-Assisted Community Detection
-#'   on Sparse Networks} of Hu & Wang (2022). \emph{CASCORE} detects the latent community structure
-#'   under the covariate assisted degree corrected stochastic block model (CADCSBM), and it allows
-#'   the disagreement between the community structures indicated in the graph and the covariates,
-#'   respectively. \code{K-means} is applied on the entry-wise ratios between first leading eigenvector
-#'   and each of the other \eqn{K} leading eigenvectors of the combined matrix of the adjacency matrix and the
-#'   covariate matrix, to reveal the underlying memberships.
+#' @details \emph{CASCORE} is fully established in \emph{Network-Adjusted Covariates for Community Detection}
+#'   of Hu & Wang (2023). \emph{CASCORE} detects the latent community structure under the covariate
+#'   assisted degree corrected stochastic block model (CADCSBM), and it allows the disagreement
+#'   between the community structures indicated in the graph and the covariates, respectively.
+#'   \code{K-means} is applied on the entry-wise ratios between first leading eigenvector and
+#'   each of the other \eqn{K} leading eigenvectors of the combined matrix of the adjacency matrix
+#'   and the covariate matrix, to reveal the underlying memberships.
 #' @param Adj A 0/1 adjacency matrix.
 #' @param Covariate A covariate matrix. The rows correspond to nodes and the columns correspond to covariates.
 #' @param K A positive integer, indicating the number of underlying communities in graph \code{Adj}.
@@ -16,13 +16,13 @@
 #'   iterations allowed. The default value is 100.
 #' @param startn \code{k-means} parameter. If centers is a number, how many
 #'   random sets should be chosen? The default value is 10.
-#' @return \item{estall}{A lavel vector.}
+#' @return \item{estall}{A lavel vector}.
 #'
 #' @importFrom pracma eig Norm
 #' @importFrom stats kmeans runif median
 #'
-#' @references Hu, Y., & Wang, W. (2022). \emph{Covariate-Assisted Community Detection on Sparse Networks}.
-#'   \cr\doi{10.48550/arXiv.2208.00257}\cr
+#' @references Hu, Y., & Wang, W. (2023) \emph{Network-AdjustedCovariatesforCommunity Detection},
+#'   \cr\url{https://arxiv.org/abs/2306.15616}\cr
 #'
 #' @examples
 #'
@@ -96,8 +96,8 @@ CASCORE = function(Adj, Covariate, K, alpha = NULL, alphan = 5, itermax = 100, s
   d = rowSums(Adj);
   X = Adj %*% Covariate
 
-  diagcomp = cbind(1, median(d)/(d+0.5));
-  lambda = apply(diagcomp, 1, min)
+  #  lambda = max(log(n), quantile(d, probs = 0.25))/(d + max(log(n), median(d, probs = 0.25)));
+  lambda = log(n)/(d + log(n));
 
   if(is.null(alpha)){
     d.net = sort(abs(eig(Adj)), decreasing = TRUE);
@@ -106,6 +106,27 @@ CASCORE = function(Adj, Covariate, K, alpha = NULL, alphan = 5, itermax = 100, s
 
     alpha = seq(alphalower, alphaupper, length.out = alphan);
     #    print(alpha)
+    est1 = matrix(0, alphan, n); est2 = est1;
+    prop1 = rep(0, alphan); prop2 = rep(0, alphan)
+
+    for(i in 1:alphan){
+      #      Newmat = X + diag(alpha[i]/(d+1))%*%Covariate;
+      Newmat = X + alpha[i]*diag(lambda)%*%Covariate;
+      zz = Newmat%*%t(Newmat)
+      c = eigen(zz)
+      vec = c$vectors
+      vecn = vec[,1:K]/apply(vec[,1:K], 1, Norm);
+      result = kmeans(vecn, K, iter.max = itermax, nstart = startn);
+      if (result$ifault==4) { result = kmeans(X, K,  iter.max = itermax, nstart = startn, algorithm="Lloyd"); }
+      prop2[i] = result$tot.withinss;
+      est2[i,] = as.factor(result$cluster);
+    }
+    est = est2[which.min(prop2), ];
+    print(alpha[which.min(prop2)])
+    #    print(prop2)
+  }
+  else{
+    alphan = length(alpha);
     est1 = matrix(0, alphan, n); est2 = est1;
     prop1 = rep(0, alphan); prop2 = rep(0, alphan)
 
@@ -121,15 +142,6 @@ CASCORE = function(Adj, Covariate, K, alpha = NULL, alphan = 5, itermax = 100, s
       est2[i,] = as.factor(result$cluster);
     }
     est = est2[which.min(prop2), ];
-    #    print(prop2)
-  }
-  else{
-    Newmat = X + alpha*diag(lambda)%*%Covariate;
-    c.svd = svd(Newmat, nu = K, nv = K)
-    vec = c.svd$u
-    vecn = vec/apply(vec, 1, Norm);
-    result = kmeans(vecn, K, iter.max = itermax, nstart = startn);
-    est = as.factor(result$cluster);
   }
   estall[ind_reg] = est;
   return(estall)

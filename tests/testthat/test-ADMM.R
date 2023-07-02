@@ -41,6 +41,6 @@ for (i in 1: ncol(D0)){
 
 test_that("This function returns a list of predicted membership of all nodes, the optimal weight between the graph
           and the covariates, as well as within-group variances for each value of alpha", {
-            expect_length(ADMM(Adj, X, lambda = 0.2, K = K, alpha = 0.5, rho = 2, TT = 100, tol = 5), n)
-            expect_length(unique(ADMM(Adj, X, lambda = 0.2, K = K, alpha = 0.5, rho = 2, TT = 100, tol = 5)), K)
+            expect_length(ADMM(Adj, X, lambda = 0.2, K = K, alpha = 0.5, rho = 2, TT = 100, tol = 5)$estall, n)
+            expect_length(unique(ADMM(Adj, X, lambda = 0.2, K = K, alpha = 0.5, rho = 2, TT = 100, tol = 5)$estall), K)
           })

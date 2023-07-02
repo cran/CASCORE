@@ -3,6 +3,8 @@
 export(ADMM)
 export(CASC)
 export(CASCORE)
+export(Cov_based)
+export(Net_based)
 export(SCORE)
 export(nPCA)
 export(oPCA)
